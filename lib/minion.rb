@@ -25,7 +25,7 @@ module Minion
 
 		encoded = JSON.dump(data)
 		log "send: #{queue}:#{encoded}"
-		bunny.queue(queue, :durable => true, :auto_delete => false).publish(encoded)
+		bunny.queue(queue, :auto_delete => false).publish(encoded)
 	end
 
 	def log(msg)
@@ -46,11 +46,11 @@ module Minion
 		handler.when = options[:when] if options[:when]
 		handler.unsub = lambda do
 			log "unsubscribing to #{queue}"
-			MQ.queue(queue, :durable => true, :auto_delete => false).unsubscribe
+			MQ.queue(queue, :auto_delete => false).unsubscribe
 		end
 		handler.sub = lambda do
 			log "subscribing to #{queue}"
-			MQ.queue(queue, :durable => true, :auto_delete => false).subscribe(:ack => true) do |h,m|
+			MQ.queue(queue, :auto_delete => false).subscribe(:ack => true) do |h,m|
 				return if AMQP.closing?
 				begin
 					log "recv: #{queue}:#{m}"
